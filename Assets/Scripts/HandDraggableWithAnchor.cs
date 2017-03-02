@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using System;
 using HoloToolkit.Unity;
+using System.Collections;
 
 namespace HoloToolkit.Unity.SpatialMapping
 {
@@ -112,7 +113,6 @@ namespace HoloToolkit.Unity.SpatialMapping
 
         private Camera mainCamera;
         private bool isGazed;
-        private IsBeingPlacedStates previousPlacingMethod = IsBeingPlacedStates.No;
         private Vector3 objRefForward;
         private float objRefDistance;
         private Quaternion gazeAngularOffset;
@@ -273,13 +273,14 @@ namespace HoloToolkit.Unity.SpatialMapping
             }
         }
 
+        public Vector3 userPosition, targetDirection;
+        public Vector3 handPosition = Vector3.zero, handPivotPosition = Vector3.zero;
+        Vector3 hit;
         /// <summary>
         /// Update the position of the object being dragged.
         /// </summary>
         private void UpdateDragging()
         {
-            Vector3 userPosition, targetDirection;
-            Vector3 handPosition = Vector3.zero, handPivotPosition = Vector3.zero;
             if (IsBeingPlaced == IsBeingPlacedStates.ByHand
                 && currentInputSource != null
                 && currentInputSource.TryGetPosition(currentInputSourceId, out handPosition))
@@ -324,13 +325,11 @@ namespace HoloToolkit.Unity.SpatialMapping
                     float targetDistance = objRefDistance + distanceOffset;
                     draggingPosition = handPivotPosition + (targetDirection * targetDistance);
                     ObjectToPlace.transform.position = draggingPosition + mainCamera.transform.TransformDirection(objRefGrabPoint);
-                    previousPlacingMethod = IsBeingPlacedStates.ByHand;
                 }
                 else // by gaze
                 {
                     // put this object at 2m in the gaze direction
                     ObjectToPlace.transform.position = userPosition + targetDirection * FloatingDistanceWhenNoSpatialMappingHit;
-                    previousPlacingMethod = IsBeingPlacedStates.ByGaze;
                 }
             }
             if (IsFacingUser)
@@ -375,13 +374,18 @@ namespace HoloToolkit.Unity.SpatialMapping
                         // if object is close to spatial mapping mesh, show mesh
                         if (sqrMagnitude < 2 * sqrSpatialMappingAlignmentDistance)
                             spatialMappingManager.DrawVisualMeshes = DrawVisualMeshes;
+                        else
+                            spatialMappingManager.DrawVisualMeshes = false;
                         // if object is very close to spatial mapping mesh, declare placement possible
                         if (sqrMagnitude < sqrSpatialMappingAlignmentDistance)
                             return true;
+                        else
+                            return false;
                     }
                 }
             }
             hitInfo = new RaycastHit();
+            spatialMappingManager.DrawVisualMeshes = false;
             return false;
         }
 
@@ -419,7 +423,6 @@ namespace HoloToolkit.Unity.SpatialMapping
             InputManager.Instance.PopModalInputHandler();
 
             IsBeingPlaced = IsBeingPlacedStates.No;
-            previousPlacingMethod = IsBeingPlacedStates.No;
 
             currentInputSource = null;
             StoppedDragging.RaiseEvent();
@@ -500,6 +503,12 @@ namespace HoloToolkit.Unity.SpatialMapping
 
             currentInputSource = eventData.InputSource;
             currentInputSourceId = eventData.SourceId;
+            StartCoroutine("DelayedStartDraggingByHand");
+        }
+
+        IEnumerator DelayedStartDraggingByHand()
+        {
+            yield return new WaitForSeconds(0.1f);
             StartDragging(IsBeingPlacedStates.ByHand);
         }
 
@@ -532,11 +541,11 @@ namespace HoloToolkit.Unity.SpatialMapping
             if (DraggingMethod == DraggingMethods.TapToPlaceWithGaze
                 || DraggingMethod == DraggingMethods.TapToPlaceWithGazePlusPreciseHandDrag)
             {
+                // Handles the case when the inputDown event is raising a StartDraggingByHand and prevent Gaze state toggling
+                // if a StartDraggingByHand is happening, just kill it because AirTap is a priority
+                StopCoroutine("DelayedStartDraggingByHand");
                 // On each tap gesture, toggle whether the user is in placing mode.
-                if (IsBeingPlaced == IsBeingPlacedStates.ByGaze
-                    // Handles the case where the inputDown event is raising a ByHand and loosing the Gaze state
-                    // AirTap must be quick and clean with no UpdateDragging
-                    || (IsBeingPlaced == IsBeingPlacedStates.ByHand && previousPlacingMethod == IsBeingPlacedStates.ByGaze))
+                if (IsBeingPlaced == IsBeingPlacedStates.ByGaze)
                     StopDragging();
                 else
                     StartDragging(IsBeingPlacedStates.ByGaze);

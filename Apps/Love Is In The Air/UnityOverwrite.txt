@@ -9,7 +9,7 @@ Love Is In The Air.sln: modified
 GeneratedProjects\UWP\Assembly-CSharp\project.json: 4FCF72A4D5EDB37E24C206A7BCFE7AF1
 GeneratedProjects\UWP\Assembly-CSharp-firstpass\project.json: 4FCF72A4D5EDB37E24C206A7BCFE7AF1
 Love Is In The Air\App.cs: 4612D09EF70CE4DECAD40B9DF344C011
-Love Is In The Air\Love Is In The Air.csproj: 5924EEC7028A5BA79900B15719B716B4
+Love Is In The Air\Love Is In The Air.csproj: 123AE0CA38A80CBD03277A9121133DBF
 Love Is In The Air\Love Is In The Air.csproj.user: modified
 Love Is In The Air\Package.appxmanifest: 710C6B98B666442DB9C17822E68E8635
 Love Is In The Air\project.json: 1D02BC64BAC0D041019673A1C4C51737
@@ -20,8 +20,9 @@ Love Is In The Air\Assets\Square44x44Logo.scale-200.png: 6C6EF27184ABE9D870A9D56
 Love Is In The Air\Assets\Square44x44Logo.targetsize-24_altform-unplated.png: 156637F7B5363E983E7A46D8E533A23D
 Love Is In The Air\Assets\StoreLogo.png: 90BD194CA4A7CFFF3E8B8222229857FB
 Love Is In The Air\Assets\Wide310x150Logo.scale-200.png: C96846A80DF667F87355569CD816192D
-Love Is In The Air\bin\x86\Debug\AppX\Assets\SplashScreen.scale-200.png: 60618416282ED104FD1473935716045D
+Love Is In The Air\bin\x86\Debug\AppX\Assets\SplashScreen.scale-200.png: modified
 Love Is In The Air\bin\x86\Debug\AppX\Assets\Square150x150Logo.scale-200.png: E02834B4A5DFB97FF8E212C1CACBB084
+Love Is In The Air\bin\x86\Debug\AppX\Assets\Square310x310Logo.scale-200.png: C08C2801A77D2184E2B9F5D8DBDEEC03
 Love Is In The Air\bin\x86\Debug\AppX\Assets\Square44x44Logo.scale-200.png: 6C6EF27184ABE9D870A9D564953775DE
 Love Is In The Air\bin\x86\Debug\AppX\Assets\Square44x44Logo.targetsize-24_altform-unplated.png: 156637F7B5363E983E7A46D8E533A23D
 Love Is In The Air\bin\x86\Debug\AppX\Assets\StoreLogo.png: 90BD194CA4A7CFFF3E8B8222229857FB

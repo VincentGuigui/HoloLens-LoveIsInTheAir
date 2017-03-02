@@ -188,6 +188,7 @@
     <Compile Include="Assets\Scripts\ColorOrTapToPlace.cs" />
     <Compile Include="Assets\Scripts\HandDraggableWithAnchor.cs" />
     <Compile Include="Assets\Scripts\SetColorFromColorPicker.cs" />
+    <Compile Include="Assets\Scripts\SetPositionFrom.cs" />
     <Compile Include="Assets\Scripts\TapToEvent.cs" />
   </ItemGroup>
   <ItemGroup>

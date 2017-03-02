@@ -17,7 +17,14 @@ obj/
 *.user
 *.unityproj
 *.booproj
-
+[Dd]ebug/
+[Rr]elease/
+[Xx]64/
+[Xx]86/
+[Bb]uild/
+[Bb]in/
+[Oo]bj/
+Apps/*
 
 .DS_Store
 .DS_Store?
