@@ -20,7 +20,7 @@ namespace HoloToolkit.Unity.SpatialMapping
                                      ISourceStateHandler
     {
 
-        public enum AlignementOptions
+        public enum PlacementOptions
         {
             Free,
             FreeAndSpatialMapping,
@@ -34,13 +34,13 @@ namespace HoloToolkit.Unity.SpatialMapping
             TapToPlaceWithGazePlusPreciseHandDrag
         }
 
-        public AlignementOptions Placement = AlignementOptions.Free;
+        public PlacementOptions Placement = PlacementOptions.Free;
         public DraggingMethods DraggingMethod = DraggingMethods.DragByHand;
 
         [Tooltip("Used in FreeAndSpatialMapping alignment mode")]
         public float SpatialMappingAlignmentDistance = 1f;
 
-        public float FloatingDistanceWhenNoSpatialMappingHit = 2f;
+        public float FloatingDistanceWhenNoSpatialMappingHit = -1f;
 
         [Tooltip("Should the object be kept upright as it is being dragged?")]
         public bool IsKeepUpright = false;
@@ -139,24 +139,23 @@ namespace HoloToolkit.Unity.SpatialMapping
                 anchorManager = WorldAnchorManager.Instance;
                 if (anchorManager == null)
                 {
-                    Debug.LogError("This script expects that you have a WorldAnchorManager component in your scene.");
+                    Debug.LogError("The EnablePersistenceInWorldAnchor flag expects that you have a WorldAnchorManager component in your scene.");
                 }
+            }
 
+            if (EnablePersistenceInWorldAnchor || Placement == PlacementOptions.ForceSpatialMapping || Placement == PlacementOptions.FreeAndSpatialMapping)
+            {
+                // Make sure we have all the components in the scene we need.
                 spatialMappingManager = SpatialMappingManager.Instance;
                 if (spatialMappingManager == null)
                 {
-                    Debug.LogError("This script expects that you have a SpatialMappingManager component in your scene.");
+                    Debug.LogError("The EnablePersistenceInWorldAnchor and Placement " + Placement.ToString() + " flags and expects that you have a SpatialMappingManager component in your scene.");
                 }
+            }
 
-                if (anchorManager != null && spatialMappingManager != null)
-                {
-                    anchorManager.AttachAnchor(gameObject, SavedAnchorFriendlyName);
-                }
-                else
-                {
-                    // If we don't have what we need to proceed, we may as well remove ourselves.
-                    Destroy(this);
-                }
+            if (anchorManager != null && spatialMappingManager != null)
+            {
+                anchorManager.AttachAnchor(gameObject, SavedAnchorFriendlyName);
             }
         }
 
@@ -232,7 +231,7 @@ namespace HoloToolkit.Unity.SpatialMapping
 
             StartedDragging.RaiseEvent();
 
-            if (Placement == AlignementOptions.ForceSpatialMapping)
+            if (Placement == PlacementOptions.ForceSpatialMapping)
             {
                 if (spatialMappingManager != null)
                     spatialMappingManager.DrawVisualMeshes = DrawVisualMeshes;
@@ -309,10 +308,14 @@ namespace HoloToolkit.Unity.SpatialMapping
                 // to how the object is placed.  For example, consider
                 // placing based on the bottom of the object's
                 // collider so it sits properly on surfaces.
-                ObjectToPlace.transform.position = hitInfo.point + mainCamera.transform.TransformDirection(objRefGrabPoint);
+                ObjectToPlace.transform.position = hitInfo.point + mainCamera.transform.TransformDirection(objRefGrabPoint)
+                    - targetDirection * .1f;
 
                 // Orient the object at the normal to spatial mapping
-                ObjectToPlace.transform.rotation = Quaternion.LookRotation(-hitInfo.normal);
+                if (!IsFacingUser)
+                {
+                    ObjectToPlace.transform.rotation = Quaternion.LookRotation(-hitInfo.normal);
+                }
             }
             else // Manual placement
             {
@@ -328,10 +331,17 @@ namespace HoloToolkit.Unity.SpatialMapping
                 }
                 else // by gaze
                 {
-                    // put this object at 2m in the gaze direction
+                    // strike ----put this object at 2m in the gaze direction-----
+
+                    // use the latest distance
+                    if (FloatingDistanceWhenNoSpatialMappingHit == -1f)
+                        FloatingDistanceWhenNoSpatialMappingHit = Vector3.Distance(userPosition, ObjectToPlace.transform.position);
+
                     ObjectToPlace.transform.position = userPosition + targetDirection * FloatingDistanceWhenNoSpatialMappingHit;
+
                 }
             }
+
             if (IsFacingUser)
             {
 
@@ -344,7 +354,6 @@ namespace HoloToolkit.Unity.SpatialMapping
                 else
                     // Rotate this object to face the camera.
                     ObjectToPlace.transform.rotation = mainCamera.transform.localRotation;
-
             }
 
             if (IsKeepUpright)
@@ -357,18 +366,26 @@ namespace HoloToolkit.Unity.SpatialMapping
         private bool CanBePlaceOnSpatialMapping(Vector3 userPosition, Vector3 targetDirection, out RaycastHit hitInfo)
         {
             if (spatialMappingManager != null
-                && (Placement == AlignementOptions.ForceSpatialMapping
-                || Placement == AlignementOptions.FreeAndSpatialMapping))
+                && (Placement == PlacementOptions.ForceSpatialMapping
+                || Placement == PlacementOptions.FreeAndSpatialMapping))
             {
                 if (Physics.Raycast(userPosition, targetDirection, out hitInfo,
                     30.0f,
                     spatialMappingManager.LayerMask))
                 {
-                    if (Placement == AlignementOptions.ForceSpatialMapping)
+                    if (Placement == PlacementOptions.ForceSpatialMapping)
+                    {
+                        spatialMappingManager.DrawVisualMeshes = DrawVisualMeshes;
                         return true;
+                    }
+
                     else // Placement == PlacementOptions.FreeDragAndSpatialMappingAlignment
                     {
-                        Vector3 heading = hitInfo.point - ObjectToPlace.transform.position;
+                        // adjust heading direction based on closest object
+                        // sometime the object go behind the hitpoint
+                        Vector3 heading = ((userPosition - hitInfo.point).sqrMagnitude < (userPosition - ObjectToPlace.transform.position).sqrMagnitude)
+                            ? (hitInfo.point - ObjectToPlace.transform.position)
+                            : (ObjectToPlace.transform.position - hitInfo.point);
                         float sqrMagnitude = heading.sqrMagnitude;
                         float sqrSpatialMappingAlignmentDistance = SpatialMappingAlignmentDistance * SpatialMappingAlignmentDistance;
                         // if object is close to spatial mapping mesh, show mesh
@@ -376,6 +393,7 @@ namespace HoloToolkit.Unity.SpatialMapping
                             spatialMappingManager.DrawVisualMeshes = DrawVisualMeshes;
                         else
                             spatialMappingManager.DrawVisualMeshes = false;
+
                         // if object is very close to spatial mapping mesh, declare placement possible
                         if (sqrMagnitude < sqrSpatialMappingAlignmentDistance)
                             return true;
@@ -385,7 +403,8 @@ namespace HoloToolkit.Unity.SpatialMapping
                 }
             }
             hitInfo = new RaycastHit();
-            spatialMappingManager.DrawVisualMeshes = false;
+            if (spatialMappingManager != null)
+                spatialMappingManager.DrawVisualMeshes = false;
             return false;
         }
 
@@ -548,7 +567,10 @@ namespace HoloToolkit.Unity.SpatialMapping
                 if (IsBeingPlaced == IsBeingPlacedStates.ByGaze)
                     StopDragging();
                 else
+                {
+                    FloatingDistanceWhenNoSpatialMappingHit = -1;
                     StartDragging(IsBeingPlacedStates.ByGaze);
+                }
             }
         }
     }
