@@ -398,7 +398,7 @@ PlayerSettings:
   metroCertificateSubject: OCTO
   metroCertificateIssuer: OCTO
   metroCertificateNotAfter: 80bad406d8a5d301
-  metroApplicationDescription: MixedCaptureProjection
+  metroApplicationDescription: LoveIsInTheAir
   wsaImages:
     131272: Assets/Textures/LoveIsInTheAirLogo1240.png
     721076: Assets/Textures/LoveIsInTheAirLogo270.png

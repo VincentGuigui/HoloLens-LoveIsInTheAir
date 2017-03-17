@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/Love Is In The Air.unity
+- path: Assets/Scenes/OCTOInterior.unity
   isLoaded: 1
   isActive: 1

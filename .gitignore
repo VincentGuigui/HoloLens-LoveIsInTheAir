@@ -24,7 +24,7 @@ obj/
 [Bb]uild/
 [Bb]in/
 [Oo]bj/
-Apps/*
+Apps/
 
 .DS_Store
 .DS_Store?

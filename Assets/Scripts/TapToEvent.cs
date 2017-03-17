@@ -4,7 +4,6 @@ using UnityEngine.Events;
 
 public class TapToEvent : MonoBehaviour, IInputClickHandler
 {
-
     [System.Serializable]
     public class TapCallback : UnityEvent<GameObject> { }
 

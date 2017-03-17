@@ -9,7 +9,7 @@ Love Is In The Air.sln: modified
 GeneratedProjects\UWP\Assembly-CSharp\project.json: 4FCF72A4D5EDB37E24C206A7BCFE7AF1
 GeneratedProjects\UWP\Assembly-CSharp-firstpass\project.json: 4FCF72A4D5EDB37E24C206A7BCFE7AF1
 Love Is In The Air\App.cs: 4612D09EF70CE4DECAD40B9DF344C011
-Love Is In The Air\Love Is In The Air.csproj: B68730AA2ECA6E9C50290B23D2087629
+Love Is In The Air\Love Is In The Air.csproj: 6CCABFB09A675F2E1A2F9BC22016CC25
 Love Is In The Air\Love Is In The Air.csproj.user: modified
 Love Is In The Air\Package.appxmanifest: 710C6B98B666442DB9C17822E68E8635
 Love Is In The Air\project.json: 1D02BC64BAC0D041019673A1C4C51737

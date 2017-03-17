@@ -209,12 +209,12 @@
 
   <ItemGroup>
     <ProjectReference Include="C:\Users\Vincent\dev_factory\Octo\HoloLens\FloatingText\Apps\Love Is In The Air\GeneratedProjects\UWP\Assembly-CSharp\Assembly-CSharp.csproj">
-      <Project>{93e28cb3-4ca5-462c-b8b7-cc4e733716fd}</Project>
+      <Project>{1c9d680b-42d0-4afb-aae1-af96ece26b94}</Project>
       <Name>Assembly-CSharp</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="C:\Users\Vincent\dev_factory\Octo\HoloLens\FloatingText\Apps\Love Is In The Air\GeneratedProjects\UWP\Assembly-CSharp-firstpass\Assembly-CSharp-firstpass.csproj">
-      <Project>{165c47f2-036f-4dce-bc2d-ff435723c43c}</Project>
+      <Project>{c4d03990-d084-4365-b1dd-2dbbae291228}</Project>
       <Name>Assembly-CSharp-firstpass</Name>
       <Private>False</Private>
     </ProjectReference>
